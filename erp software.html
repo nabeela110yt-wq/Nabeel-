@@ -1,0 +1,382 @@
+import React, { useState } from 'react';
+import { 
+  LayoutDashboard, 
+  Package, 
+  Users, 
+  DollarSign, 
+  Settings, 
+  Menu, 
+  X, 
+  Search, 
+  Bell, 
+  Plus, 
+  TrendingUp, 
+  AlertCircle,
+  MoreVertical,
+  Activity
+} from 'lucide-react';
+
+// --- Mock Initial Data ---
+const initialInventory = [
+  { id: 1, name: 'Premium Wireless Headphones', sku: 'AUD-001', category: 'Electronics', stock: 145, price: 129.99, status: 'In Stock' },
+  { id: 2, name: 'Ergonomic Office Chair', sku: 'FUR-042', category: 'Furniture', stock: 12, price: 249.00, status: 'Low Stock' },
+  { id: 3, name: 'Mechanical Keyboard v2', sku: 'PER-019', category: 'Electronics', stock: 0, price: 109.50, status: 'Out of Stock' },
+  { id: 4, name: 'Adjustable Standing Desk', sku: 'FUR-088', category: 'Furniture', stock: 34, price: 499.99, status: 'In Stock' },
+  { id: 5, name: 'USB-C Docking Station', sku: 'ACC-005', category: 'Accessories', stock: 89, price: 79.99, status: 'In Stock' },
+];
+
+const initialEmployees = [
+  { id: 1, name: 'Alice Johnson', role: 'Senior Developer', department: 'Engineering', email: 'alice.j@zenuo.com', status: 'Active' },
+  { id: 2, name: 'Marcus Smith', role: 'Sales Director', department: 'Sales', email: 'marcus.s@zenuo.com', status: 'Active' },
+  { id: 3, name: 'Sarah Davis', role: 'HR Manager', department: 'Human Resources', email: 'sarah.d@zenuo.com', status: 'On Leave' },
+  { id: 4, name: 'James Wilson', role: 'Product Designer', department: 'Design', email: 'james.w@zenuo.com', status: 'Active' },
+];
+
+// --- Main Application Component ---
+export default function App() {
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
+  // App State
+  const [inventory, setInventory] = useState(initialInventory);
+  const [employees, setEmployees] = useState(initialEmployees);
+
+  // Navigation Items
+  const navItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'inventory', label: 'Inventory', icon: Package },
+    { id: 'hr', label: 'Human Resources', icon: Users },
+    { id: 'finance', label: 'Finance', icon: DollarSign },
+    { id: 'settings', label: 'Settings', icon: Settings },
+  ];
+
+  // Action Handlers
+  const handleAddItem = () => {
+    const newItem = {
+      id: inventory.length + 1,
+      name: 'New Product ' + (inventory.length + 1),
+      sku: 'PRD-' + Math.floor(Math.random() * 10000),
+      category: 'General',
+      stock: Math.floor(Math.random() * 100) + 1,
+      price: (Math.random() * 100).toFixed(2),
+      status: 'In Stock'
+    };
+    setInventory([newItem, ...inventory]);
+  };
+
+  const handleAddEmployee = () => {
+    const newEmployee = {
+      id: employees.length + 1,
+      name: 'New Employee ' + (employees.length + 1),
+      role: 'Staff',
+      department: 'General',
+      email: `staff${employees.length + 1}@zenuo.com`,
+      status: 'Active'
+    };
+    setEmployees([newEmployee, ...employees]);
+  };
+
+  // Helper component for Status Badges
+  const StatusBadge = ({ status }) => {
+    let colorClasses = 'bg-slate-100 text-slate-800';
+    if (status === 'In Stock' || status === 'Active') {
+      colorClasses = 'bg-emerald-100 text-emerald-800';
+    } else if (status === 'Low Stock' || status === 'On Leave') {
+      colorClasses = 'bg-amber-100 text-amber-800';
+    } else if (status === 'Out of Stock' || status === 'Inactive') {
+      colorClasses = 'bg-rose-100 text-rose-800';
+    }
+    return (
+      <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${colorClasses}`}>
+        {status}
+      </span>
+    );
+  };
+
+  // --- Views ---
+  const renderDashboard = () => (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Metric Cards */}
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center space-x-4">
+          <div className="p-3 rounded-lg bg-indigo-50 text-indigo-600">
+            <DollarSign className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-slate-500">Total Revenue</p>
+            <p className="text-2xl font-bold text-slate-900">$124,563.00</p>
+          </div>
+        </div>
+        
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center space-x-4">
+          <div className="p-3 rounded-lg bg-emerald-50 text-emerald-600">
+            <Package className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-slate-500">Total Inventory Items</p>
+            <p className="text-2xl font-bold text-slate-900">{inventory.length}</p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center space-x-4">
+          <div className="p-3 rounded-lg bg-sky-50 text-sky-600">
+            <Users className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-slate-500">Active Employees</p>
+            <p className="text-2xl font-bold text-slate-900">{employees.filter(e => e.status === 'Active').length}</p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center space-x-4">
+          <div className="p-3 rounded-lg bg-rose-50 text-rose-600">
+            <AlertCircle className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-slate-500">Low Stock Alerts</p>
+            <p className="text-2xl font-bold text-slate-900">{inventory.filter(i => i.status !== 'In Stock').length}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Activity Section */}
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+          <Activity className="w-5 h-5 mr-2 text-indigo-600"/> Recent System Activity
+        </h3>
+        <div className="space-y-4">
+          {[1, 2, 3].map((_, i) => (
+            <div key={i} className="flex items-center space-x-4 p-3 hover:bg-slate-50 rounded-lg transition-colors">
+              <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-slate-800">Order #ORD-{9024 - i} processed successfully.</p>
+                <p className="text-xs text-slate-500">{i + 1} hours ago</p>
+              </div>
+              <button className="text-slate-400 hover:text-indigo-600">
+                <MoreVertical className="w-5 h-5" />
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderInventory = () => (
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+        <h2 className="text-lg font-semibold text-slate-800">Inventory Management</h2>
+        <button 
+          onClick={handleAddItem}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center"
+        >
+          <Plus className="w-4 h-4 mr-2" /> Add Item
+        </button>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-slate-200">
+          <thead className="bg-slate-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Product</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">SKU</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Category</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Stock</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Price</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-slate-200">
+            {inventory.map((item) => (
+              <tr key={item.id} className="hover:bg-slate-50 transition-colors">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">{item.name}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{item.sku}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{item.category}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{item.stock}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${item.price}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <StatusBadge status={item.status} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  const renderHR = () => (
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+        <h2 className="text-lg font-semibold text-slate-800">Employee Directory</h2>
+        <button 
+          onClick={handleAddEmployee}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center"
+        >
+          <Plus className="w-4 h-4 mr-2" /> Add Employee
+        </button>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-slate-200">
+          <thead className="bg-slate-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Name</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Role</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Department</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Email</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-slate-200">
+            {employees.map((emp) => (
+              <tr key={emp.id} className="hover:bg-slate-50 transition-colors">
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex items-center">
+                    <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs mr-3">
+                      {emp.name.charAt(0)}
+                    </div>
+                    <div className="text-sm font-medium text-slate-900">{emp.name}</div>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{emp.role}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{emp.department}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{emp.email}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <StatusBadge status={emp.status} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  const renderPlaceholder = (title) => (
+    <div className="flex flex-col items-center justify-center h-64 bg-white rounded-xl shadow-sm border border-slate-200 border-dashed">
+      <Settings className="w-12 h-12 text-slate-300 mb-4 animate-spin-slow" />
+      <h2 className="text-xl font-semibold text-slate-700 mb-2">{title} Module</h2>
+      <p className="text-slate-500">This module is currently under development.</p>
+    </div>
+  );
+
+  return (
+    <div className="flex h-screen bg-slate-50 font-sans text-slate-900 overflow-hidden">
+      
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 z-40 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-slate-300 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 flex flex-col ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="h-16 flex items-center px-6 bg-slate-950/50">
+          <div className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center mr-3 shadow-lg shadow-indigo-500/20">
+            <TrendingUp className="w-5 h-5 text-white" />
+          </div>
+          <span className="text-white text-xl font-bold tracking-tight">Zenuo ERP</span>
+          <button 
+            className="ml-auto md:hidden text-slate-400 hover:text-white"
+            onClick={() => setIsSidebarOpen(false)}
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto py-6">
+          <nav className="space-y-1 px-3">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setActiveTab(item.id);
+                    setIsSidebarOpen(false); // Close sidebar on mobile after selection
+                  }}
+                  className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+                    isActive 
+                      ? 'bg-indigo-500/10 text-indigo-400' 
+                      : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                  }`}
+                >
+                  <Icon className={`w-5 h-5 mr-3 ${isActive ? 'text-indigo-400' : 'text-slate-500'}`} />
+                  {item.label}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+        
+        <div className="p-4 bg-slate-800/50">
+          <div className="flex items-center">
+            <div className="h-9 w-9 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-sm">
+              AD
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium text-white">Admin User</p>
+              <p className="text-xs text-slate-400">admin@zenuo.com</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Header */}
+        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 z-10 shadow-sm">
+          <div className="flex items-center">
+            <button 
+              onClick={() => setIsSidebarOpen(true)} 
+              className="md:hidden text-slate-500 hover:text-slate-700 mr-4 focus:outline-none"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            
+            <div className="relative hidden sm:block max-w-md w-full">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 text-slate-400" />
+              </div>
+              <input 
+                type="text" 
+                placeholder="Search across the system..." 
+                className="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <button className="text-slate-400 hover:text-slate-600 relative">
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white"></span>
+            </button>
+          </div>
+        </header>
+
+        {/* Dynamic View Area */}
+        <main className="flex-1 overflow-y-auto bg-slate-50 p-4 sm:p-6 lg:p-8">
+          <div className="max-w-7xl mx-auto space-y-6">
+            <div className="flex flex-col mb-6">
+              <h1 className="text-2xl font-bold text-slate-900 capitalize">
+                {navItems.find(item => item.id === activeTab)?.label}
+              </h1>
+              <p className="text-sm text-slate-500 mt-1">
+                Manage your business operations efficiently.
+              </p>
+            </div>
+
+            {/* Render the selected view based on activeTab state */}
+            {activeTab === 'dashboard' && renderDashboard()}
+            {activeTab === 'inventory' && renderInventory()}
+            {activeTab === 'hr' && renderHR()}
+            {(activeTab === 'finance' || activeTab === 'settings') && renderPlaceholder(navItems.find(item => item.id === activeTab)?.label)}
+          </div>
+        </main>
+      </div>
+
+    </div>
+  );
+}
